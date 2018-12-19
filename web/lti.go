@@ -4,7 +4,7 @@
 package web
 
 import (
-	"fmt"
+//	"fmt"
 //	b64 "encoding/base64"
 	"net/http"
 //  "strings"
@@ -36,19 +36,20 @@ func loginWithLti(c *Context, w http.ResponseWriter, r *http.Request) {
 	}
 	
 
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s = %s</div>", "LTI login test", email, user.Id)
+	//w.Header().Set("Content-Type", "text/html")
+	//fmt.Fprintf(w, "<h1>%s</h1><div>%s = %s</div>", "LTI login test", email, user.Id)
 
-	/* TODO need to figure out what deviceId is. -mjl
 	var session *model.Session
+	var deviceId  string // no deviceId
 	session, err = c.App.DoLogin(w, r, user, deviceId)
 	if err != nil {
 		c.Err = err
 		return
 	}
-	*/
 
-	//http.Redirect(w, r, c.GetSiteURLHeader(), http.StatusFound)
+	c.Session = *session
+
+	http.Redirect(w, r, c.GetSiteURLHeader(), http.StatusFound)
 
 	/* From api4/user.go/login() - we need to do much of this here as well -mjl
 
