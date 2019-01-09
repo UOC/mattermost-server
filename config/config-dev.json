@@ -328,30 +328,30 @@
     },
     "LtiSettings": {
         "Enable": false,
-        "lmss": [
+        "Lmss": [
             {
-                "name": "Emeritus",
-                "type": "canvas",
-                "oauth": {
-                    "consumerKey": "canvas-emeritus_5863",
-                    "consumerSecret": "emeritus secret"
+                "Name": "Emeritus",
+                "Type": "canvas",
+                "Oauth": {
+                    "ConsumerKey": "canvas-emeritus_5863",
+                    "ConsumerSecret": "emeritus secret"
                 },
-                "groupApi": {
-                    "type": "Emeritus",
-                    "riffGroupRegex": "^riff_",
-                    "authorizationToken": "7357~ROt7SAzB9gjdBQQA2lI0JfpfZ4ckTxd0CYZIZwzM8qMFGjiz4SQILBObJ3NuFDuR"
+                "GroupApi": {
+                    "Type": "Emeritus",
+                    "RiffGroupRegex": "^riff_",
+                    "AuthorizationToken": "7357~ROt7SAzB9gjdBQQA2lI0JfpfZ4ckTxd0CYZIZwzM8qMFGjiz4SQILBObJ3NuFDuR"
                 }
             },
             {
-                "name": "Appsembler",
-                "type": "edx",
-                "oauth": {
-                    "consumerKey": "edx-appsembler-test_5345",
-                    "consumerSecret": "appsembler secret"
+                "Name": "Appsembler",
+                "Type": "edx",
+                "Oauth": {
+                    "ConsumerKey": "edx-appsembler-test_5345",
+                    "ConsumerSecret": "appsembler secret"
                 },
-                "groupApi": {
-                    "type": "custom-property",
-                    "groupPropertyName": "custom_cohort_name"
+                "GroupApi": {
+                    "Type": "custom-property",
+                    "GroupPropertyName": "custom_cohort_name"
                 }
             }
         ]
