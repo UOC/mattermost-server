@@ -359,6 +359,10 @@
                     "ConsumerKey": "edx-appsembler-test_5345",
                     "ConsumerSecret": "appsembler secret"
                 },
+                "ContextTeamMap":
+                [
+                    { "context_id": "course-v1:appsembler-the-red+Riff+101", "TeamSlug": "riff" }
+                ],
                 "UserChannels": {
                     "Type": "custom-properties",
                     "ChannelList":
