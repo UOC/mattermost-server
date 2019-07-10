@@ -22,11 +22,27 @@ func (a *App) GetLMSToUse(consumerKey string) model.LMS {
 
 func (a *App) OnboardLTIUser(userId string, lms model.LMS, launchData map[string]string) *model.AppError {
 	teamName := lms.GetTeam(launchData)
+	// create team if doesn't exists
+	team, err := a.GetTeamByName(teamName)
+	if err != nil {
+		// build team data from LTI context
+		if team, err = lms.BuildTeam(launchData); err != nil {
+			mlog.Error(fmt.Sprintf("Team could not created. Error: %s", err.Error()))
+			return err
+		}
+		// create team
+		if team, err = a.CreateTeam(team); err != nil {
+			mlog.Error(fmt.Sprintf("Error creating team in database. Error: %s", err.Error()))
+			return err
+		}
+	}
+
+	mlog.Debug("team created", mlog.Any("team", team))
 	if err := a.addTeamMemberIfRequired(userId, teamName); err != nil {
 		return err
 	}
 
-	team, err := a.GetTeamByName(teamName)
+	team, err = a.GetTeamByName(teamName)
 	if err != nil {
 		return err
 	}
