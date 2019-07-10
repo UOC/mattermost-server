@@ -57,22 +57,19 @@ func loginWithLTI(c *Context, w http.ResponseWriter, r *http.Request) {
 		mlog.Debug("MM or LTI User not found")
 		c.Logout(w, r)
 
-		// Don't redirect to signup page if BuildUser is going to fail
-		if user, err = lms.BuildUser(launchData, ""); err != nil {
+		// Don't create if BuildUser is going to fail
+		if user, err = lms.BuildUser(launchData, "lti4ever!"); err != nil { // hardcoded password
 			c.Err = err
 			return
 		}
 
-		if err := setLTIDataCookie(c, w, launchData); err != nil {
-			c.Err = err
+		// create the user directly in database
+		mlog.Debug("Creating LTI user", mlog.Any("user", user))
+		if user, err = c.App.CreateUser(user); err != nil {
+			mlog.Error("Error occurred while creating LTI user: " + err.Error())
+			c.Err = err //model.NewAppError("loginWithLTI", "web.lti.login.create_user.app_error", map[string]interface{}{"UserError": err.Message}, err.Error(), err.StatusCode)
 			return
 		}
-
-		setUserNameCookie(c, w, user.FirstName+" "+user.LastName)
-
-		mlog.Debug("Redirecting to login page")
-		http.Redirect(w, r, c.GetSiteURLHeader()+"/signup_lti", http.StatusFound)
-		return
 	}
 
 	if user.Email == email {
