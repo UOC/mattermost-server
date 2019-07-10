@@ -17,6 +17,8 @@ const (
 	launchDataLTIUserIdKey       = "custom_user_id"
 	launchDataChannelRedirectKey = "custom_channel_redirect"
 	launchDataFullNameKey        = "lis_person_name_full"
+	launchDataContextTitle       = "context_id"
+	launchDataContextId          = "context_title"
 
 	redirectChannelLookupKeyword = "lookup"
 )
@@ -190,4 +192,14 @@ func (e *EdxLMS) SyncUser(user *User, launchData map[string]string) *User {
 
 	user.Props[LTI_USER_ID_PROP_KEY] = e.GetUserId(launchData)
 	return user
+}
+
+func (e *EdxLMS) BuildTeam(launchData map[string]string) (*Team, *AppError) {
+	team := &Team{
+		DisplayName:     launchData[launchDataContextTitle],
+		Name:            launchData[launchDataContextId],
+		AllowOpenInvite: false,
+	}
+
+	return team, nil
 }

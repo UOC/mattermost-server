@@ -45,6 +45,7 @@ type LMS interface {
 	GetPrivateChannelsToJoin(launchData map[string]string) map[string]string
 	GetChannel(launchData map[string]string) (string, *AppError)
 	SyncUser(user *User, launchData map[string]string) *User
+	BuildTeam(launchData map[string]string) (*Team, *AppError)
 }
 
 type LTISettings struct {
