@@ -17,6 +17,8 @@ const (
 
 	LMS_TYPE_EDX = "edx"
 
+	LMS_TYPE_UOC = "uoc"
+
 	LTI_LAUNCH_DATA_COOKIE = "MMLTILAUNCHDATA"
 
 	LTI_NAME_COOKIE = "MMLTINAME"
@@ -67,6 +69,11 @@ func (l *LTISettings) GetKnownLMSs() []LMS {
 			var decodedEdx EdxLMS
 			if json.Unmarshal(bytes, &decodedEdx) == nil {
 				ret = append(ret, &decodedEdx)
+			}
+		case LMS_TYPE_UOC:
+			var decodedUoc UocLMS
+			if json.Unmarshal(bytes, &decodedUoc) == nil {
+				ret = append(ret, &decodedUoc)
 			}
 		}
 	}
