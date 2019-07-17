@@ -158,26 +158,16 @@ func (e *UocLMS) GetPrivateChannelsToJoin(launchData map[string]string) map[stri
 }
 
 func (e *UocLMS) GetChannel(launchData map[string]string) (string, *AppError) {
-	customChannelRedirect, ok := launchData[uocLaunchDataChannelRedirectKey]
-	if !ok {
+	privateChannels := e.GetPrivateChannelsToJoin(launchData)
+	if len(privateChannels) == 0 {
 		return "", nil
 	}
 
-	var channelSlug string
-
-	components := strings.Split(customChannelRedirect, ":")
-	if len(components) == 1 {
-		channelSlug = components[0]
-	} else if components[0] == uocRedirectChannelLookupKeyword {
-		UocChannel, ok := e.PersonalChannels.ChannelList[components[1]]
-		if !ok {
-			return "", NewAppError("GetChannel", "get_channel.redirect_lookup_channel.not_found", nil, "", http.StatusBadRequest)
-		}
-
-		channelSlug = GetLMSChannelSlug(components[1], launchData[UocChannel.IdProperty])
+	for channelSlug, _ := range privateChannels {
+		return truncateLMSChannelSlug(channelSlug), nil
 	}
 
-	return truncateLMSChannelSlug(channelSlug), nil
+	return "", nil
 }
 
 func (e *UocLMS) SyncUser(user *User, launchData map[string]string) *User {
