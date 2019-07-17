@@ -9,17 +9,19 @@ import (
 )
 
 const (
-	uocLaunchDataEmailKey           = "lis_person_contact_email_primary"
-	uocLaunchDataUsernameKey        = "custom_username" //"lis_person_sourcedid"
-	uocLaunchDataFirstNameKey       = "lis_person_name_given"
-	uocLaunchDataLastNameKey        = "lis_person_name_family"
-	uocLaunchDataPositionKey        = "roles"
-	uocLaunchDataLTIUserIdKey       = "lis_person_sourcedid"
-	uocLaunchDataChannelRedirectKey = "custom_channel_redirect"
-	uocLaunchDataFullNameKey        = "lis_person_name_full"
-	uocLaunchDataContextId          = "context_id"
-	uocLaunchDataContextTitle       = "context_title"
-	uocLaunchDataPresentationLocale = "launch_presentation_locale"
+	uocLaunchDataEmailKey               = "lis_person_contact_email_primary"
+	uocLaunchDataUsernameKey            = "custom_username" //"lis_person_sourcedid"
+	uocLaunchDataFirstNameKey           = "lis_person_name_given"
+	uocLaunchDataLastNameKey            = "lis_person_name_family"
+	uocLaunchDataPositionKey            = "roles"
+	uocLaunchDataLTIUserIdKey           = "lis_person_sourcedid"
+	uocLaunchDataChannelRedirectKey     = "custom_channel_redirect"
+	uocLaunchDataFullNameKey            = "lis_person_name_full"
+	uocLaunchDataContextId              = "context_id"
+	uocLaunchDataContextTitle           = "context_title"
+	uocLaunchDataPresentationLocale     = "launch_presentation_locale"
+	uocLaunchDataTeamIsTransversalParam = "custom_transversal_team"
+	uocLaunchDataTransversalTeamParam   = "custom_domain_coditercers"
 
 	uocRedirectChannelLookupKeyword = "lookup"
 )
@@ -129,6 +131,10 @@ func (e *UocLMS) BuildUser(launchData map[string]string, password string) (*User
 }
 
 func (e *UocLMS) GetTeam(launchData map[string]string) string {
+	// team depends on an LTI param
+	if launchData[uocLaunchDataTeamIsTransversalParam] != "" {
+		return launchData[uocLaunchDataTransversalTeamParam]
+	}
 	return launchData[uocLaunchDataContextId]
 }
 
