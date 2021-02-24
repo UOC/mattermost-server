@@ -4,6 +4,7 @@
 package model
 
 import (
+	"encoding/base64"
 	"net/http"
 	"strings"
 )
@@ -22,6 +23,7 @@ const (
 	uocLaunchDataPresentationLocale     = "launch_presentation_locale"
 	uocLaunchDataTeamIsTransversalParam = "custom_transversal_team"
 	uocLaunchDataTransversalTeamParam   = "custom_domain_coditercers"
+	uocBase64Encoded                    = "custom_base64Encoded"
 
 	uocRedirectChannelLookupKeyword = "lookup"
 )
@@ -52,8 +54,20 @@ type UocLMS struct {
 	DefaultChannels  map[string]UocDefaultChannel
 }
 
+func returnValueBase64Encoded(value string, launchData map[string]string) string {
+
+	if val, ok := launchData[uocBase64Encoded]; ok {
+		if val == "1" {
+			sDec, _ := base64.StdEncoding.DecodeString(value)
+			return string(value)
+		}
+	}
+
+	return value
+}
+
 func (e *UocLMS) GetEmail(launchData map[string]string) string {
-	return launchData[uocLaunchDataEmailKey]
+	return returnValueBase64Encoded(launchData[uocLaunchDataEmailKey], launchData)
 }
 
 func (e *UocLMS) GetName() string {
@@ -73,7 +87,7 @@ func (e *UocLMS) GetOAuthConsumerSecret() string {
 }
 
 func (e *UocLMS) GetUserId(launchData map[string]string) string {
-	return launchData[uocLaunchDataLTIUserIdKey]
+	return returnValueBase64Encoded(launchData[uocLaunchDataLTIUserIdKey], launchData)
 }
 
 func (e *UocLMS) ValidateLTIRequest(url string, request *http.Request) bool {
@@ -98,8 +112,8 @@ func (e *UocLMS) BuildUser(launchData map[string]string, password string) (*User
 		return nil, NewAppError("Uoc_BuildUser", "Uoc.build_user.lti_user_id_missing", nil, "", http.StatusBadRequest)
 	}
 
-	firstName := strings.Trim(launchData[uocLaunchDataFirstNameKey], " ")
-	lastName := strings.Trim(launchData[uocLaunchDataLastNameKey], " ")
+	firstName := strings.Trim(returnValueBase64Encoded(launchData[uocLaunchDataFirstNameKey], launchData), " ")
+	lastName := strings.Trim(returnValueBase64Encoded(launchData[uocLaunchDataLastNameKey], launchData), " ")
 
 	if firstName == "" || lastName == "" {
 		name := strings.SplitN(strings.Trim(launchData[uocLaunchDataFullNameKey], " "), " ", 2)
@@ -113,18 +127,18 @@ func (e *UocLMS) BuildUser(launchData map[string]string, password string) (*User
 	}
 
 	if firstName == "" {
-		firstName = launchData[uocLaunchDataUsernameKey]
+		firstName = returnValueBase64Encoded(launchData[uocLaunchDataUsernameKey], launchData)
 	}
 
 	user := &User{
 		FirstName: firstName,
 		LastName:  lastName,
-		Email:     launchData[uocLaunchDataEmailKey],
-		Username:  transformLTIUsername(launchData[uocLaunchDataUsernameKey]),
-		Position:  launchData[uocLaunchDataPositionKey],
+		Email:     returnValueBase64Encoded(launchData[uocLaunchDataEmailKey], launchData),
+		Username:  transformLTIUsername(returnValueBase64Encoded(launchData[uocLaunchDataUsernameKey], launchData)),
+		Position:  returnValueBase64Encoded(launchData[uocLaunchDataPositionKey], launchData),
 		Password:  password,
 		Props:     props,
-		Locale:    launchData[uocLaunchDataPresentationLocale],
+		Locale:    returnValueBase64Encoded(launchData[uocLaunchDataPresentationLocale], launchData),
 	}
 
 	return user, nil
@@ -133,9 +147,9 @@ func (e *UocLMS) BuildUser(launchData map[string]string, password string) (*User
 func (e *UocLMS) GetTeam(launchData map[string]string) string {
 	// team depends on an LTI param
 	if launchData[uocLaunchDataTeamIsTransversalParam] != "" {
-		return launchData[uocLaunchDataTransversalTeamParam]
+		return returnValueBase64Encoded(launchData[uocLaunchDataTransversalTeamParam], launchData)
 	}
-	return launchData[uocLaunchDataContextId]
+	return returnValueBase64Encoded(launchData[uocLaunchDataContextId], launchData)
 }
 
 func (e *UocLMS) GetPublicChannelsToJoin(launchData map[string]string) map[string]string {
@@ -146,8 +160,8 @@ func (e *UocLMS) GetPrivateChannelsToJoin(launchData map[string]string) map[stri
 	channels := map[string]string{}
 
 	for personalChannelName, channelConfig := range e.PersonalChannels.ChannelList {
-		channelDisplayName := launchData[channelConfig.NameProperty]
-		channelSlug := GetLMSChannelSlug(personalChannelName, launchData[channelConfig.IdProperty])
+		channelDisplayName := returnValueBase64Encoded(launchData[channelConfig.NameProperty], launchData)
+		channelSlug := GetLMSChannelSlug(personalChannelName, returnValueBase64Encoded(launchData[channelConfig.IdProperty], launchData))
 
 		if channelDisplayName != "" && channelSlug != "" {
 			channels[channelSlug] = channelDisplayName
@@ -172,15 +186,15 @@ func (e *UocLMS) GetChannel(launchData map[string]string) (string, *AppError) {
 
 func (e *UocLMS) SyncUser(user *User, launchData map[string]string) *User {
 	if launchData[uocLaunchDataEmailKey] != "" {
-		user.Email = launchData[uocLaunchDataEmailKey]
+		user.Email = returnValueBase64Encoded(launchData[uocLaunchDataEmailKey], launchData)
 	}
 
 	if launchData[uocLaunchDataUsernameKey] != "" {
-		user.Username = transformLTIUsername(launchData[uocLaunchDataUsernameKey])
+		user.Username = transformLTIUsername(returnValueBase64Encoded(launchData[uocLaunchDataUsernameKey], launchData))
 	}
 
 	if launchData[uocLaunchDataPositionKey] != "" {
-		user.Position = launchData[uocLaunchDataPositionKey]
+		user.Position = returnValueBase64Encoded(launchData[uocLaunchDataPositionKey], launchData)
 	}
 
 	if user.Props == nil {
@@ -193,8 +207,8 @@ func (e *UocLMS) SyncUser(user *User, launchData map[string]string) *User {
 
 func (e *UocLMS) BuildTeam(launchData map[string]string) (*Team, *AppError) {
 	team := &Team{
-		DisplayName:     launchData[uocLaunchDataContextTitle],
-		Name:            launchData[uocLaunchDataContextId],
+		DisplayName:     returnValueBase64Encoded(launchData[uocLaunchDataContextTitle], launchData),
+		Name:            returnValueBase64Encoded(launchData[uocLaunchDataContextId], launchData),
 		AllowOpenInvite: false,
 		Type:            TEAM_INVITE,
 	}
